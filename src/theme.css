@@ -1,0 +1,47 @@
+:root {
+  --el-font-family: "Poppins", "PingFang SC", "Microsoft YaHei",
+    "Helvetica Neue", Helvetica, "Heiti SC";
+  color-scheme: light;
+  /* --el-color-white: #ffffff; */
+  --el-color-black: #000000;
+  --el-color-primary: #066f97;
+  --el-color-primary-rgb: 6, 111, 151;
+  --el-color-success-rgb: 22, 182, 179;
+  --el-color-warning-rgb: 255, 184, 0;
+  --el-color-danger-rgb: 213, 51, 91;
+  --el-color-error-rgb: 213, 51, 91;
+  --el-color-info-rgb: 144, 147, 153;
+  --el-color-primary-light-1: #1f7da1;
+  --el-color-primary-light-2: #388cac;
+  --el-color-primary-light-3: #519ab6;
+  --el-color-primary-light-4: #6aa9c1;
+  --el-color-primary-light-5: #83b7cb;
+  --el-color-primary-light-6: #9bc5d5;
+  --el-color-primary-light-7: #b4d4e0;
+  --el-color-primary-light-8: #cde2ea;
+  --el-color-primary-light-9: #e6f1f5;
+  --el-color-primary-dark-2: #055979;
+  --el-custom-sidebar-header-bg-color: #ffffff;
+  --component-card-linear-bg: linear-gradient(
+    92.31deg,
+    rgba(18, 70, 104, 0.88) -0.07%,
+    rgba(70, 99, 119, 0.97) 100%
+  );
+  --component-card-loading-linear-bg: linear-gradient(
+    90deg,
+    rgba(18, 70, 104, 0.3) 25%,
+    rgba(18, 70, 104, 0.5) 37%,
+    rgba(18, 70, 104, 0.5) 63%
+  );
+  --security-card-linear-bg: linear-gradient(
+    92.31deg,
+    rgba(23, 107, 135, 0.87) 0%,
+    rgba(65, 109, 124, 0.92) 99.93%
+  );
+  --security-card-loading-linear-bg: linear-gradient(
+    90deg,
+    rgba(23, 107, 135, 0.3) 25%,
+    rgba(23, 107, 135, 0.5) 37%,
+    rgba(23, 107, 135, 0.5) 63%
+  );
+}
