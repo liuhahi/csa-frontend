@@ -141,7 +141,7 @@
             :pagination-props="paginationProps"
             :has-expand="true"
             :expandFixed="true"
-            :row-key="'id'"
+            :row-key="'library_version_id'"
             v-loading="loading"
             :expandName="'security-section'"
             @queryChange="handleQueryChange"
@@ -157,6 +157,19 @@
                 @keyup.stop="handleSearch"
                 @clear="fireSearch"
               />
+            </template>
+            <template #security-section="{ props }">
+              <div class="py-6 px-3">
+                <el-txt type="subtitle1">Security Issues</el-txt>
+                <el-master-table
+                  :table-width="'700px'"
+                  :has-pagination="false"
+                  :size="'small'"
+                  :data="props.row.security_issues"
+                  :columns="securityColumns"
+                >
+                </el-master-table>
+              </div>
             </template>
           </el-master-table>
         </el-static-card>
@@ -250,7 +263,38 @@ const columns = [
   },
 ];
 
-function handleExpandChange() {}
+const securityColumns = [
+  {
+    label: "Public ID",
+    type: "text",
+    prop: "public_id",
+    align: "center",
+    headerAlign: "center",
+    minWidth: "99px",
+  },
+  {
+    label: "Status",
+    type: "text",
+    prop: "status",
+    align: "center",
+    headerAlign: "center",
+    minWidth: "99px",
+  },
+  {
+    label: "Exploitable",
+    type: "text",
+    prop: "exploitability",
+    align: "center",
+    headerAlign: "center",
+    minWidth: "99px",
+  },
+];
+
+function handleExpandChange(row, expandedRows) {
+  console.log("row", row, expandedRows);
+  if (expandedRows.length) {
+  }
+}
 
 function handleQueryChange(query: any) {
   const { page, limit } = query;
