@@ -16,6 +16,9 @@ dependencies:
     version: 3.4.21
 
 devDependencies:
+  '@element-plus/icons-vue':
+    specifier: ^2.1.0
+    version: 2.3.1(vue@3.4.21)
   '@vitejs/plugin-vue':
     specifier: ^5.0.4
     version: 5.0.4(vite@5.2.4)(vue@3.4.21)
@@ -368,7 +371,6 @@ packages:
       vue: ^3.2.0
     dependencies:
       vue: 3.4.21
-    dev: false
 
   /@esbuild/aix-ppc64@0.20.2:
     resolution: {integrity: sha512-D+EBOJHXdNZcLJRBkhENNG8Wji2kgc9AZ9KiPr1JuZjsNtyHzrsfLRrY0tk2H2aoFu6RANO1y1iPPUCDYWkb5g==}
