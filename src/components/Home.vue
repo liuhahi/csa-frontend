@@ -131,42 +131,41 @@
         <el-txt type="h6">Patch Results</el-txt>
       </div>
       <div class="mt-4">
-        <el-master-table
-          ref="tableRef"
-          :max-height="1000"
-          :data="tableData"
-          :columns="columns"
-          :pagination-props="paginationProps"
-          :has-expand="true"
-          :expandFixed="true"
-          :row-key="'id'"
-          :expandName="'compareComponent'"
-        ></el-master-table>
+        <el-static-card>
+          <el-master-table
+            ref="tableRef"
+            :max-height="1000"
+            :data="tableData"
+            :columns="columns"
+            :pagination-props="paginationProps"
+            :has-expand="true"
+            :expandFixed="true"
+            :row-key="'id'"
+            v-loading="loading"
+            :expandName="'security-section'"
+            @queryChange="handleQueryChange"
+            @expand-change="handleExpandChange"
+          >
+            <template #top-left>
+              <el-input
+                style="width: 1144px"
+                v-model="q.search"
+                clearable
+                :prefix-icon="Search"
+                placeholder="Search library"
+                @keyup.stop="handleSearch"
+                @clear="fireSearch"
+              />
+            </template>
+          </el-master-table>
+        </el-static-card>
       </div>
     </div>
   </div>
-  <!-- <el-master-table
-    ref="tableRef"
-    :max-height="1000"
-    v-loading="loading"
-    :data="tableData"
-    :columns="columns"
-    :table-width="`100%`"
-    :row-class-name="tableRowClassName"
-    :pagination-props="paginationProps"
-    :stripe="true"
-    :has-expand="true"
-    :expandFixed="true"
-    :row-key="'id'"
-    :expandName="'compareComponent'"
-    class="static m-master_table"
-    @queryChange="handleQueryChange"
-    @expand-change="handleExpandChange"
-  >
-  </el-master-table> -->
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, reactive } from "vue";
+import { Search } from "@element-plus/icons-vue";
 const general_lib_ver = ref<{
   total_processed: number;
   fixed: number;
@@ -193,21 +192,90 @@ const general_issue = ref<{
   exploitable: 0,
 });
 
+const allData = ref([]);
+const tableData = ref([]);
+const loading = ref(false);
+const q = reactive({
+  page: 1,
+  limit: 10,
+  search: "",
+});
+
+const paginationProps = reactive({
+  total: tableData.value.length,
+  pageSize: q.limit,
+});
+
 const columns = [
   {
-    label: "PROJECT_NAME",
+    label: "Library",
     type: "text",
-    prop: "name",
-    translate: true,
+    prop: "library_name",
     align: "left",
     headerAlign: "left",
     minWidth: "99px",
   },
+  {
+    label: "Version",
+    type: "text",
+    prop: "version_number",
+    align: "center",
+    headerAlign: "center",
+    minWidth: "99px",
+  },
+  {
+    label: "Patch Branch",
+    type: "text",
+    prop: "patch_branch",
+    align: "center",
+    headerAlign: "center",
+    minWidth: "99px",
+  },
+  {
+    label: "Status",
+    type: "text",
+    prop: "status",
+    align: "center",
+    headerAlign: "center",
+    minWidth: "99px",
+  },
+  {
+    label: "Repo Url",
+    type: "Link",
+    prop: "repo_url",
+    align: "center",
+    headerAlign: "center",
+    minWidth: "99px",
+  },
 ];
 
-const tableData = ref([]);
+function handleExpandChange() {}
+
+function handleQueryChange(query: any) {
+  const { page, limit } = query;
+  q.page = page;
+  q.limit = limit;
+  tableData.value = allData.value.slice((page - 1) * limit, page * limit);
+  console.log("limit is", limit, page);
+}
+
+function handleSearch() {
+  console.log("searching", q);
+  const result = allData.value.filter((item) => {
+    return item.library_name.toLowerCase().includes(q.search.toLowerCase());
+  });
+  paginationProps.total = result.length;
+  console.log("result", result.length);
+  tableData.value = result.slice((q.page - 1) * q.limit, q.page * q.limit);
+}
+
+function fireSearch() {
+  q.search = "";
+  handleSearch();
+}
 
 function init() {
+  loading.value = true;
   fetch("output_frontend_summary.json", {
     headers: {
       "Content-Type": "application/json",
@@ -219,19 +287,29 @@ function init() {
       general_lib_ver.value = resJson.general_lib_ver;
       general_issue.value = resJson.general_issue;
     });
-  // fetch("output_frontend.json", {
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //     Accept: "application/json",
-  //   },
-  // })
-  //   .then((response) => response.json())
-  //   .then((resJson) => {
-  //     output_frontend.value = resJson;
-  //   });
+  fetch("output_frontend.json", {
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+  })
+    .then((response) => response.json())
+    .then((resJson) => {
+      loading.value = false;
+      allData.value = resJson.map((item) => {
+        if (item.patch_branch == "") {
+          item.patch_branch = "-";
+        }
+        item.repo_url = {
+          label: item.repo_url,
+          to: item.repo_url,
+        };
+        return item;
+      });
+      paginationProps.total = allData.value.length;
+      tableData.value = allData.value.slice(0, q.limit);
+    });
 }
-
-function processSummary(summary) {}
 
 init();
 </script>
