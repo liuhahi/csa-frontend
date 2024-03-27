@@ -149,7 +149,7 @@
           >
             <template #top-left>
               <el-input
-                style="width: 1144px"
+                style="width: 100%"
                 v-model="q.search"
                 clearable
                 :prefix-icon="Search"
@@ -157,6 +157,11 @@
                 @keyup.stop="handleSearch"
                 @clear="fireSearch"
               />
+            </template>
+            <template #status="{ row }">
+              <el-custom-tag :type="getPatchStatusColour(row.status)">
+                {{ getPatchStatusName(row.status) }}
+              </el-custom-tag>
             </template>
             <template #security-section="{ props }">
               <div class="py-6 px-3">
@@ -168,6 +173,17 @@
                   :data="props.row.security_issues"
                   :columns="securityColumns"
                 >
+                  <template #status="{ row }">
+                    <el-custom-tag :type="getPatchStatusColour(row.status)">
+                      {{ getPatchStatusName(row.status) }}
+                    </el-custom-tag>
+                  </template>
+
+                  <template #exploitability="{ row }">
+                    <el-txt type="body2">
+                      {{ row.exploitability === false ? "No" : "Yes" }}
+                    </el-txt>
+                  </template>
                 </el-master-table>
               </div>
             </template>
@@ -180,6 +196,11 @@
 <script setup lang="ts">
 import { ref, reactive } from "vue";
 import { Search } from "@element-plus/icons-vue";
+import {
+  getPatchStatusColour,
+  getPatchStatusName,
+} from "../utils/helperFunctions";
+
 const general_lib_ver = ref<{
   total_processed: number;
   fixed: number;
@@ -228,6 +249,7 @@ const columns = [
     align: "left",
     headerAlign: "left",
     minWidth: "99px",
+    fixed: "left",
   },
   {
     label: "Version",
@@ -247,7 +269,7 @@ const columns = [
   },
   {
     label: "Status",
-    type: "text",
+    type: "Any",
     prop: "status",
     align: "center",
     headerAlign: "center",
@@ -274,7 +296,7 @@ const securityColumns = [
   },
   {
     label: "Status",
-    type: "text",
+    type: "Any",
     prop: "status",
     align: "center",
     headerAlign: "center",
@@ -282,7 +304,7 @@ const securityColumns = [
   },
   {
     label: "Exploitable",
-    type: "text",
+    type: "Any",
     prop: "exploitability",
     align: "center",
     headerAlign: "center",
