@@ -1,132 +1,133 @@
 <template>
-  <div class="h-full flex justify-center">
-    <div class="">
-      <div class="flex items-start">
-        <el-txt type="h6">Summary</el-txt>
-      </div>
-      <div class="flex space-x-4">
-        <div>
-          <div class="flex flex-row mt-4 shadow-lg">
+  <div class="h-full w-full flex justify-center">
+    <div class="w-full">
+      <div class="flex flex-col gap-y-4">
+        <div class="flex items-start">
+          <el-txt type="h6">Summary</el-txt>
+        </div>
+        <div class="w-full flex flex-col xl:flex-row gap-x-4 gap-y-6">
+          <div class="rounded-lg basis-1/2 flex flex-row custom-shadow">
             <div
-              class="rounded-l-lg flex justify-center green-bg text-white h-18 py-4 px-6"
+              class="min-w-max rounded-l-lg flex justify-center green-bg text-white py-4 px-6"
             >
-              <div class="flex flex-col">
+              <div class="flex flex-col justify-center gap-y-1">
                 <div>
-                  <el-txt type="h4" color="white">{{
+                  <el-txt type="h4" color="white" class="min-w-max">{{
                     general_lib_ver.total_processed
                   }}</el-txt>
                 </div>
-                <div class="mt-2">
-                  <el-txt type="body1" color="white"
-                    >Total Library Version</el-txt
-                  >
-                </div>
+
+                <el-txt type="body1" color="white" class="min-w-max"
+                  >Total Library Version</el-txt
+                >
               </div>
             </div>
-            <div
-              class="rounded-r-lg flex justify-center bg-white text-white h-18 py-4 px-6"
-            >
-              <div class="flex items-center">
+            <div class="rounded-r-lg flex bg-white text-white w-full py-4 px-6">
+              <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
                 <div class="flex flex-col items-center justify-center">
-                  <div>
-                    <el-txt type="h6">{{ general_lib_ver.fixed }}</el-txt>
-                  </div>
-                  <div><el-txt type="body1" color="regular">Fixed</el-txt></div>
+                  <el-txt type="h6" class="min-w-max">{{
+                    general_lib_ver.fixed
+                  }}</el-txt>
+
+                  <el-txt type="body1" color="regular" class="min-w-max"
+                    >Fixed</el-txt
+                  >
                 </div>
                 <div class="flex items-center align-middle">
                   <el-divider class="divider" direction="vertical" />
                 </div>
                 <div class="flex flex-col items-center justify-center">
-                  <div>
-                    <el-txt type="h6">{{
-                      general_lib_ver.partial_fixed
-                    }}</el-txt>
-                  </div>
-                  <div>
-                    <el-txt type="body1" color="regular">Partial Fixed</el-txt>
-                  </div>
+                  <el-txt type="h6" class="min-w-max">{{
+                    general_lib_ver.partial_fixed
+                  }}</el-txt>
+
+                  <el-txt type="body1" color="regular" class="min-w-max"
+                    >Partial Fixed</el-txt
+                  >
                 </div>
                 <div class="flex items-center align-middle">
                   <el-divider class="divider" direction="vertical" />
                 </div>
                 <div class="flex flex-col items-center justify-center">
-                  <div>
-                    <el-txt type="h6">{{ general_lib_ver.failed }}</el-txt>
-                  </div>
-                  <div>
-                    <el-txt type="body1" color="regular">Failed</el-txt>
-                  </div>
+                  <el-txt type="h6" class="min-w-max">{{
+                    general_lib_ver.failed
+                  }}</el-txt>
+
+                  <el-txt type="body1" color="regular" class="min-w-max"
+                    >Failed</el-txt
+                  >
                 </div>
               </div>
             </div>
           </div>
-        </div>
-        <div>
-          <div class="flex flex-row mt-4 shadow-lg">
+
+          <div class="rounded-lg basis-1/2 flex flex-row custom-shadow">
             <div
-              class="rounded-l-lg flex justify-center danger-bg text-white h-18 py-4 px-6 w-36"
+              class="rounded-l-lg flex justify-center danger-bg text-white py-4 px-6"
             >
-              <div class="flex flex-col">
-                <div>
-                  <el-txt type="h4" color="white">{{
-                    general_issue.total_processed
-                  }}</el-txt>
-                </div>
-                <div class="mt-2">
-                  <el-txt type="body1" color="white"
-                    >Total Vulnerabilities</el-txt
-                  >
-                </div>
+              <div class="flex flex-col justify-center gap-y-1">
+                <el-txt type="h4" color="white" class="min-w-max">{{
+                  general_issue.total_processed
+                }}</el-txt>
+
+                <el-txt type="body1" color="white" class="min-w-max"
+                  >Total Vulnerabilities</el-txt
+                >
               </div>
             </div>
-            <div
-              class="rounded-r-lg flex justify-center bg-white text-white h-18 py-4 px-6"
-            >
-              <div class="flex items-center">
+            <div class="rounded-r-lg flex bg-white text-white w-full py-4 px-6">
+              <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
                 <div class="flex flex-col items-center justify-center">
-                  <div>
-                    <el-txt type="h6">{{ general_issue.fixed }}</el-txt>
-                  </div>
-                  <div><el-txt type="body1" color="regular">Fixed</el-txt></div>
+                  <el-txt type="h6" class="min-w-max">{{
+                    general_issue.fixed
+                  }}</el-txt>
+
+                  <el-txt type="body1" color="regular" class="min-w-max"
+                    >Fixed</el-txt
+                  >
                 </div>
                 <div class="flex items-center align-middle">
                   <el-divider class="divider" direction="vertical" />
                 </div>
                 <div class="flex flex-col items-center justify-center">
-                  <div>
-                    <el-txt type="h6">{{ general_issue.partial_fixed }}</el-txt>
-                  </div>
-                  <div>
-                    <el-txt type="body1" color="regular">Partial Fixed</el-txt>
-                  </div>
+                  <el-txt type="h6" class="min-w-max">{{
+                    general_issue.partial_fixed
+                  }}</el-txt>
+
+                  <el-txt type="body1" color="regular" class="min-w-max"
+                    >Partial Fixed</el-txt
+                  >
                 </div>
                 <div class="flex items-center align-middle">
                   <el-divider class="divider" direction="vertical" />
                 </div>
                 <div class="flex flex-col items-center justify-center">
-                  <div>
-                    <el-txt type="h6">{{ general_issue.failed }}</el-txt>
-                  </div>
-                  <div>
-                    <el-txt type="body1" color="regular">Failed</el-txt>
-                  </div>
+                  <el-txt type="h6" class="min-w-max">{{
+                    general_issue.failed
+                  }}</el-txt>
+
+                  <el-txt type="body1" color="regular" class="min-w-max"
+                    >Failed</el-txt
+                  >
                 </div>
                 <div class="flex items-center align-middle">
                   <el-divider class="divider" direction="vertical" />
                 </div>
                 <div class="flex flex-col items-center justify-center">
-                  <div>
-                    <el-txt type="h6">{{ general_issue.exploitable }}</el-txt>
-                  </div>
-                  <div>
-                    <el-txt type="body1" color="regular">Exploitable</el-txt>
-                  </div>
+                  <el-txt type="h6" class="min-w-max">{{
+                    general_issue.exploitable
+                  }}</el-txt>
+
+                  <el-txt type="body1" color="regular" class="min-w-max"
+                    >Exploitable</el-txt
+                  >
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
       <div class="flex items-start mt-14">
         <el-txt type="h6">Patch Results</el-txt>
       </div>

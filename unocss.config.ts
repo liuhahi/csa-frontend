@@ -6,6 +6,7 @@ export default defineConfig({
   shortcuts: {
     "bg-color": "bg-white dark:bg-gray-950",
     "bg-color-primary": "primary-bg dark:bg-gray-800",
+    
   },
   rules: [
     ["primary-txt", { color: "var(--el-text-color-primary) !important" }],
@@ -55,6 +56,12 @@ export default defineConfig({
         animation: "skeleton-loading 1.4s ease infinite alternate",
       },
     ],
+    [
+      "custom-shadow",
+      {
+        "box-shadow": "0px 0px 12px 0px rgba(0, 0, 0, 0.12)"
+      }
+    ]
   ],
   theme: {
     colors: {
@@ -66,5 +73,8 @@ export default defineConfig({
       "primary-light-9": "var(--el-color-primary-light-9)",
       "primary-dark-2": "var(--el-color-primary-dark-2)",
     },
+    borderRadius: {
+      lg: "16px",
+    }
   },
 });
