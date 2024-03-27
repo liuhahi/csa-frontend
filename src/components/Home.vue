@@ -149,7 +149,7 @@
           >
             <template #top-left>
               <el-input
-                style="width: 100%"
+                style="width: 300px"
                 v-model="q.search"
                 clearable
                 :prefix-icon="Search"
@@ -157,6 +157,19 @@
                 @keyup.stop="handleSearch"
                 @clear="fireSearch"
               />
+              <el-select
+                v-model="q.select"
+                clearable
+                placeholder="Status"
+                @change="(val) => handleChange(val, 'status')"
+              >
+                <el-option
+                  v-for="item in statusList"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
             </template>
             <template #status="{ row }">
               <el-custom-tag :type="getPatchStatusColour(row.status)">
@@ -230,9 +243,28 @@ const general_issue = ref<{
 const allData = ref([]);
 const tableData = ref([]);
 const loading = ref(false);
+const statusList = [
+  {
+    label: "Fixed",
+    value: "fixed",
+  },
+  {
+    label: "Partial Fixed",
+    value: "partial_fixed",
+  },
+  {
+    label: "Patching",
+    value: "patching",
+  },
+  {
+    label: "Failed",
+    value: "failed",
+  },
+];
 const q = reactive({
   page: 1,
   limit: 10,
+  status: "",
   search: "",
 });
 
@@ -244,8 +276,8 @@ const paginationProps = reactive({
 const columns = [
   {
     label: "Library",
-    type: "text",
-    prop: "library_name",
+    type: "Link",
+    prop: "library",
     align: "left",
     headerAlign: "left",
     minWidth: "99px",
@@ -271,6 +303,14 @@ const columns = [
     label: "Status",
     type: "Any",
     prop: "status",
+    align: "center",
+    headerAlign: "center",
+    minWidth: "99px",
+  },
+  {
+    label: "Fixed / Total",
+    type: "text",
+    prop: "fixedStatus",
     align: "center",
     headerAlign: "center",
     minWidth: "99px",
@@ -312,6 +352,12 @@ const securityColumns = [
   },
 ];
 
+function handleChange(val, key) {
+  q[key] = val;
+  q.page = 1;
+  handleSearch();
+}
+
 function handleExpandChange(row, expandedRows) {
   console.log("row", row, expandedRows);
   if (expandedRows.length) {
@@ -322,17 +368,20 @@ function handleQueryChange(query: any) {
   const { page, limit } = query;
   q.page = page;
   q.limit = limit;
-  tableData.value = allData.value.slice((page - 1) * limit, page * limit);
+  handleSearch();
+  // tableData.value = allData.value.slice((page - 1) * limit, page * limit);
   console.log("limit is", limit, page);
 }
 
 function handleSearch() {
   console.log("searching", q);
-  const result = allData.value.filter((item) => {
+  let result = allData.value.filter((item) => {
     return item.library_name.toLowerCase().includes(q.search.toLowerCase());
   });
+  if (q.status) {
+    result = result.filter((item) => item.status === q.status);
+  }
   paginationProps.total = result.length;
-  console.log("result", result.length);
   tableData.value = result.slice((q.page - 1) * q.limit, q.page * q.limit);
 }
 
@@ -367,10 +416,18 @@ function init() {
         if (item.patch_branch == "") {
           item.patch_branch = "-";
         }
+        item.library = {
+          label: item.library_name,
+          to: item.fork_repo_url,
+        };
         item.repo_url = {
           label: item.repo_url,
           to: item.repo_url,
         };
+        item.fixedStatus = `${
+          item.security_issues.filter((issue) => issue.status === "fixed")
+            .length
+        } / ${item.security_issues.length}`;
         return item;
       });
       paginationProps.total = allData.value.length;
