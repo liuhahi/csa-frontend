@@ -293,7 +293,7 @@ const columns = [
   },
   {
     label: "Patch Branch",
-    type: "text",
+    type: "Link",
     prop: "patch_branch",
     align: "center",
     headerAlign: "center",
@@ -335,7 +335,7 @@ const securityColumns = [
     minWidth: "99px",
   },
   {
-    label: "Status",
+    label: "Patch Status",
     type: "Any",
     prop: "status",
     align: "center",
@@ -414,7 +414,15 @@ function init() {
       loading.value = false;
       allData.value = resJson.map((item) => {
         if (item.patch_branch == "") {
-          item.patch_branch = "-";
+          item.patch_branch = {
+            label: "-",
+            to: "",
+          };
+        } else {
+          item.patch_branch = {
+            label: item.patch_branch,
+            to: `${item.fork_repo_url}/tree/${item.patch_branch}`,
+          };
         }
         item.library = {
           label: item.library_name,
@@ -428,6 +436,14 @@ function init() {
           item.security_issues.filter((issue) => issue.status === "fixed")
             .length
         } / ${item.security_issues.length}`;
+
+        item.security_issues = item.security_issues.map((issue) => {
+          issue.fixedStatus = `${
+            issue.patch_commits.filter((issue) => issue.status === "fixed")
+              .length
+          } / ${issue.patch_commits.length}`;
+          return issue;
+        });
         return item;
       });
       paginationProps.total = allData.value.length;
