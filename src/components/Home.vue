@@ -6,7 +6,7 @@
           <el-txt type="h6">Summary</el-txt>
         </div>
         <div class="w-full flex flex-col xl:flex-row gap-x-4 gap-y-6">
-          <div class="rounded-lg basis-1/2 flex flex-row custom-shadow">
+          <div class="rounded-lg basis-5/12 flex flex-row custom-shadow">
             <div
               class="min-w-max rounded-l-lg flex justify-center green-bg text-white py-4 px-6"
             >
@@ -61,7 +61,7 @@
             </div>
           </div>
 
-          <div class="rounded-lg basis-1/2 flex flex-row custom-shadow">
+          <div class="rounded-lg basis-7/12 flex flex-row custom-shadow">
             <div
               class="rounded-l-lg flex justify-center danger-bg text-white py-4 px-6"
             >
@@ -158,13 +158,26 @@
                 @clear="fireSearch"
               />
               <el-select
-                v-model="q.select"
+                v-model="q.status"
                 clearable
                 placeholder="Status"
                 @change="(val) => handleChange(val, 'status')"
               >
                 <el-option
                   v-for="item in statusList"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+              <el-select
+                v-model="q.exploitable"
+                clearable
+                placeholder="Exploitability"
+                @change="(val) => handleChange(val, 'exploitable')"
+              >
+                <el-option
+                  v-for="item in exploitableList"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value"
@@ -219,11 +232,13 @@ const general_lib_ver = ref<{
   fixed: number;
   partial_fixed: number;
   failed: number;
+  exploitable: string;
 }>({
   total_processed: 0,
   fixed: 0,
   partial_fixed: 0,
   failed: 0,
+  exploitable: "",
 });
 
 const general_issue = ref<{
@@ -261,11 +276,22 @@ const statusList = [
     value: "failed",
   },
 ];
+const exploitableList = [
+  {
+    label: "Exploitable",
+    value: "Yes",
+  },
+  {
+    label: "Not Exploitable",
+    value: "No",
+  },
+];
 const q = reactive({
   page: 1,
   limit: 10,
   status: "",
   search: "",
+  exploitable: "",
 });
 
 const paginationProps = reactive({
@@ -316,6 +342,14 @@ const columns = [
     minWidth: "99px",
   },
   {
+    label: "Exploitable",
+    type: "text",
+    prop: "exploitable",
+    align: "center",
+    headerAlign: "center",
+    minWidth: "99px",
+  },
+  {
     label: "Repo Url",
     type: "Link",
     prop: "repo_url",
@@ -343,7 +377,7 @@ const securityColumns = [
     minWidth: "99px",
   },
   {
-    label: "Exploitable",
+    label: "Exploitability",
     type: "Any",
     prop: "exploitability",
     align: "center",
@@ -355,6 +389,7 @@ const securityColumns = [
 function handleChange(val, key) {
   q[key] = val;
   q.page = 1;
+  console.log("what is q", q);
   handleSearch();
 }
 
@@ -381,6 +416,9 @@ function handleSearch() {
   if (q.status) {
     result = result.filter((item) => item.status === q.status);
   }
+  if (q.exploitable) {
+    result = result.filter((item) => item.exploitable === q.exploitable);
+  }
   paginationProps.total = result.length;
   tableData.value = result.slice((q.page - 1) * q.limit, q.page * q.limit);
 }
@@ -388,6 +426,18 @@ function handleSearch() {
 function fireSearch() {
   q.search = "";
   handleSearch();
+}
+
+function formatNumber<T extends Record<string, any>>(obj: T): T {
+  const newObj: Partial<T> = {};
+  for (const key in obj) {
+    if (typeof obj[key] === "number") {
+      newObj[key] = obj[key].toLocaleString();
+    } else {
+      newObj[key] = obj[key];
+    }
+  }
+  return newObj as T;
 }
 
 function init() {
@@ -400,8 +450,8 @@ function init() {
   })
     .then((response) => response.json())
     .then((resJson) => {
-      general_lib_ver.value = resJson.general_lib_ver;
-      general_issue.value = resJson.general_issue;
+      general_lib_ver.value = formatNumber(resJson.general_lib_ver);
+      general_issue.value = formatNumber(resJson.general_issue);
     });
   fetch("output_frontend.json", {
     headers: {
@@ -413,6 +463,7 @@ function init() {
     .then((resJson) => {
       loading.value = false;
       allData.value = resJson.map((item) => {
+        item.exploitable = "No";
         if (item.patch_branch == "") {
           item.patch_branch = {
             label: "-",
@@ -438,10 +489,19 @@ function init() {
         } / ${item.security_issues.length}`;
 
         item.security_issues = item.security_issues.map((issue) => {
+          // if there are any fixed issues considered as fixed
+          issue.status = issue.patch_commits.some(
+            (issue) => issue.status === "fixed"
+          )
+            ? "fixed"
+            : "failed";
           issue.fixedStatus = `${
             issue.patch_commits.filter((issue) => issue.status === "fixed")
               .length
           } / ${issue.patch_commits.length}`;
+          if (issue.exploitability) {
+            item.exploitable = "Yes";
+          }
           return issue;
         });
         return item;
