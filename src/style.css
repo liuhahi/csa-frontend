@@ -1,4 +1,6 @@
 :root {
   background: var(--el-bg-color-page);
-  
+}
+.el-master-table--top-wrapper .pull-left {
+  width: 100%;
 }
