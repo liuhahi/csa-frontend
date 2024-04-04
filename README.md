@@ -1,8 +1,6 @@
-# Vue 3 + Vite
+# CSA Frontend
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
-
-Sure, here's a setup section for your README.md file on GitHub:
+![Preview Image](public/preview.png)
 
 ---
 
