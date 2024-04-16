@@ -5,6 +5,12 @@
         <div class="flex items-start">
           <el-txt type="h6">Summary</el-txt>
         </div>
+        <el-static-card is-border small class="flex items-center">
+          <el-txt type="body1" class="flex items-center"
+            >Total <b class="mx-2">{{ total_lib_ver_analyzed }}</b> packages
+            analyzed
+          </el-txt>
+        </el-static-card>
         <div class="w-full flex flex-col xl:flex-row gap-x-4 gap-y-6">
           <div class="rounded-lg basis-5/12 flex flex-row custom-shadow">
             <div
@@ -227,6 +233,7 @@ import {
   getPatchStatusName,
 } from "../utils/helperFunctions";
 
+const total_lib_ver_analyzed = ref(0);
 const general_lib_ver = ref<{
   total_processed: number;
   fixed: number;
@@ -450,6 +457,8 @@ function init() {
   })
     .then((response) => response.json())
     .then((resJson) => {
+      total_lib_ver_analyzed.value =
+        resJson.total_lib_ver_analyzed.toLocaleString();
       general_lib_ver.value = formatNumber(resJson.general_lib_ver);
       general_issue.value = formatNumber(resJson.general_issue);
     });
