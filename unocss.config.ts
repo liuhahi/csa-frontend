@@ -61,6 +61,12 @@ export default defineConfig({
       {
         "box-shadow": "0px 0px 12px 0px rgba(0, 0, 0, 0.12)"
       }
+    ],
+    [
+      "border-color-light",
+      {
+        "border-color": "var(--el-border-color-light)"
+      }
     ]
   ],
   theme: {
@@ -73,8 +79,5 @@ export default defineConfig({
       "primary-light-9": "var(--el-color-primary-light-9)",
       "primary-dark-2": "var(--el-color-primary-dark-2)",
     },
-    borderRadius: {
-      lg: "16px",
-    }
   },
 });
