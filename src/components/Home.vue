@@ -5,10 +5,19 @@
         <div class="flex items-start">
           <el-txt type="h6">Summary</el-txt>
         </div>
+        <div
+          class="rounded-lg px-4 py-2 bg-white border border-solid border-color-light flex items-center gap-x-2"
+        >
+          <el-txt type="body1" class="regular-txt"> Total </el-txt>
+          <el-txt type="h6" class="regular-txt">
+            {{ total_lib_ver_analyzed }}
+          </el-txt>
+          <el-txt type="body1" class="regular-txt"> packages analyzed </el-txt>
+        </div>
         <div class="w-full flex flex-col xl:flex-row gap-x-4 gap-y-6">
-          <div class="rounded-lg basis-5/12 flex flex-row custom-shadow">
+          <div class="rounded-2xl basis-5/12 flex flex-row custom-shadow">
             <div
-              class="min-w-max rounded-l-lg flex justify-center green-bg text-white py-4 px-6"
+              class="min-w-max rounded-l-2xl flex justify-center green-bg text-white py-4 px-6"
             >
               <div class="flex flex-col justify-center gap-y-1">
                 <div>
@@ -22,7 +31,9 @@
                 >
               </div>
             </div>
-            <div class="rounded-r-lg flex bg-white text-white w-full py-4 px-6">
+            <div
+              class="rounded-r-2xl flex bg-white text-white w-full py-4 px-6"
+            >
               <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
                 <div class="flex flex-col items-center justify-center">
                   <el-txt type="h6" class="min-w-max">{{
@@ -61,9 +72,9 @@
             </div>
           </div>
 
-          <div class="rounded-lg basis-7/12 flex flex-row custom-shadow">
+          <div class="rounded-2xl basis-7/12 flex flex-row custom-shadow">
             <div
-              class="rounded-l-lg flex justify-center danger-bg text-white py-4 px-6"
+              class="min-w-max rounded-l-2xl flex justify-center danger-bg text-white py-4 px-6"
             >
               <div class="flex flex-col justify-center gap-y-1">
                 <el-txt type="h4" color="white" class="min-w-max">{{
@@ -75,7 +86,9 @@
                 >
               </div>
             </div>
-            <div class="rounded-r-lg flex bg-white text-white w-full py-4 px-6">
+            <div
+              class="rounded-r-2xl flex bg-white text-white w-full py-4 px-6"
+            >
               <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
                 <div class="flex flex-col items-center justify-center">
                   <el-txt type="h6" class="min-w-max">{{
@@ -115,11 +128,11 @@
                 </div>
                 <div class="flex flex-col items-center justify-center">
                   <el-txt type="h6" class="min-w-max">{{
-                    general_issue.exploitable
+                    unique_issue.total_processed
                   }}</el-txt>
 
                   <el-txt type="body1" color="regular" class="min-w-max"
-                    >Exploitable</el-txt
+                    >Exploitability Check</el-txt
                   >
                 </div>
               </div>
@@ -227,6 +240,7 @@ import {
   getPatchStatusName,
 } from "../utils/helperFunctions";
 
+const total_lib_ver_analyzed = ref(0);
 const general_lib_ver = ref<{
   total_processed: number;
   fixed: number;
@@ -242,6 +256,20 @@ const general_lib_ver = ref<{
 });
 
 const general_issue = ref<{
+  total_processed: number;
+  fixed: number;
+  partial_fixed: number;
+  failed: number;
+  exploitable: number;
+}>({
+  total_processed: 0,
+  fixed: 0,
+  partial_fixed: 0,
+  failed: 0,
+  exploitable: 0,
+});
+
+const unique_issue = ref<{
   total_processed: number;
   fixed: number;
   partial_fixed: number;
@@ -450,8 +478,11 @@ function init() {
   })
     .then((response) => response.json())
     .then((resJson) => {
+      total_lib_ver_analyzed.value =
+        resJson.total_lib_ver_analyzed.toLocaleString();
       general_lib_ver.value = formatNumber(resJson.general_lib_ver);
       general_issue.value = formatNumber(resJson.general_issue);
+      unique_issue.value = formatNumber(resJson.unique_issue);
     });
   fetch("output_frontend.json", {
     headers: {
