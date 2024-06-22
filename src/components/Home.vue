@@ -183,6 +183,35 @@
                   :value="item.value"
                 ></el-option>
               </el-select>
+              <el-select
+                v-model="q.fixible"
+                clearable
+                placeholder="Fixibility"
+                @change="(val) => handleChange(val, 'fixible')"
+              >
+                <el-option
+                  v-for="item in fixibility"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+            </template>
+            <template #library="{ row }">
+              <div class="flex gap-x-4 items-center">
+                <el-link :underline="false" :to="row.library.to"
+                  ><el-txt type="subtitle2">{{
+                    row.library.label
+                  }}</el-txt></el-link
+                >
+                <div
+                  v-if="row.fixible"
+                  style="color: #14b8a6"
+                  class="flex items-center"
+                >
+                  <el-icon><QuestionFilled /> </el-icon>
+                </div>
+              </div>
             </template>
             <template #status="{ row }">
               <el-custom-tag :type="getPatchStatusColour(row.status)">
@@ -210,6 +239,18 @@
                       {{ row.exploitability === false ? "No" : "Yes" }}
                     </el-txt>
                   </template>
+
+                  <template #ai_fix="{ row }">
+                    <el-button
+                      v-if="row.ai_fix"
+                      size="small"
+                      type="success"
+                      @click="openPatchModal"
+                    >
+                      Try Fix
+                    </el-button>
+                    <el-txt v-else type="body2"> - </el-txt>
+                  </template>
                 </el-master-table>
               </div>
             </template>
@@ -218,14 +259,20 @@
       </div>
     </div>
   </div>
+  <PatchModal v-model="showPatchModal" />
 </template>
 <script setup lang="ts">
-import { ref, reactive } from "vue";
-import { Search } from "@element-plus/icons-vue";
+import { ref, reactive, watch } from "vue";
+import { Search, QuestionFilled } from "@element-plus/icons-vue";
+import { useRoute } from "vue-router";
 import {
   getPatchStatusColour,
   getPatchStatusName,
 } from "../utils/helperFunctions";
+import { getCVEObjects } from "@/api/cve";
+import PatchModal from "./PatchModal.vue";
+
+const route = useRoute();
 
 const general_lib_ver = ref<{
   total_processed: number;
@@ -286,12 +333,23 @@ const exploitableList = [
     value: "No",
   },
 ];
+const fixibility = [
+  {
+    label: "Fixible",
+    value: true,
+  },
+  {
+    label: "To be fixed",
+    value: false,
+  },
+];
 const q = reactive({
   page: 1,
   limit: 10,
   status: "",
   search: "",
-  exploitable: "",
+  exploitable: "Yes",
+  fixible: true,
 });
 
 const paginationProps = reactive({
@@ -302,7 +360,7 @@ const paginationProps = reactive({
 const columns = [
   {
     label: "Library",
-    type: "Link",
+    type: "Any",
     prop: "library",
     align: "left",
     headerAlign: "left",
@@ -384,7 +442,18 @@ const securityColumns = [
     headerAlign: "center",
     minWidth: "99px",
   },
+  {
+    label: "AI Fix",
+    type: "Any",
+    prop: "ai_fix",
+    align: "center",
+    headerAlign: "center",
+    minWidth: "99px",
+  },
 ];
+
+const cveList = ref([]);
+const showPatchModal = ref(false);
 
 function handleChange(val, key) {
   q[key] = val;
@@ -409,15 +478,17 @@ function handleQueryChange(query: any) {
 }
 
 function handleSearch() {
-  console.log("searching", q);
-  let result = allData.value.filter((item) => {
+  let result = allData.value.filter((item: any) => {
     return item.library_name.toLowerCase().includes(q.search.toLowerCase());
   });
   if (q.status) {
-    result = result.filter((item) => item.status === q.status);
+    result = result.filter((item: any) => item.status === q.status);
   }
   if (q.exploitable) {
-    result = result.filter((item) => item.exploitable === q.exploitable);
+    result = result.filter((item: any) => item.exploitable === q.exploitable);
+  }
+  if (q.fixible) {
+    result = result.filter((item) => item.fixible === q.fixible);
   }
   paginationProps.total = result.length;
   tableData.value = result.slice((q.page - 1) * q.limit, q.page * q.limit);
@@ -440,8 +511,17 @@ function formatNumber<T extends Record<string, any>>(obj: T): T {
   return newObj as T;
 }
 
+function openPatchModal() {
+  showPatchModal.value = true;
+}
+
 function init() {
   loading.value = true;
+  // load router query
+  q.search = (route.query.search as string) || "";
+  getCVEObjects().then((res) => {
+    cveList.value = res;
+  });
   fetch("output_frontend_summary.json", {
     headers: {
       "Content-Type": "application/json",
@@ -504,10 +584,28 @@ function init() {
           }
           return issue;
         });
+        // check if manual patch is available
+        let count = 0;
+        item.security_issues.forEach((issue) => {
+          if (
+            cveList.value?.some(
+              (obj) =>
+                obj.cve_id == issue.public_id &&
+                obj.versions.includes(item.version_number)
+            )
+          ) {
+            count += 1;
+            issue.ai_fix = true;
+          }
+        });
+
+        item.security_issues.sort((x) => (x.ai_fix ? -1 : 1));
+        item.fixible = count > 0;
         return item;
       });
       paginationProps.total = allData.value.length;
-      tableData.value = allData.value.slice(0, q.limit);
+      handleSearch();
+      // tableData.value = allData.value.slice(0, q.limit);
     });
 }
 
