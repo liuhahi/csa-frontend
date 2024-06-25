@@ -43,15 +43,23 @@
                 :modified="modifiedFile"
                 :language="language"
               />
-              <pre v-else><code>
-                {{ step.result }}
-              </code></pre>
+              <pre v-else><code>{{ step.result }}</code></pre>
             </div>
           </li>
         </ul>
       </el-static-card>
       <div class="flex justify-end">
-        <el-button type="success" @click="generate" style="width: 120px">
+        <el-button
+          v-if="generating"
+          type="success"
+          loading
+          disabled
+          @click="generate"
+          style="width: 120px"
+        >
+          Generating
+        </el-button>
+        <el-button v-else type="success" @click="generate" style="width: 120px">
           Generate
         </el-button>
       </div>
@@ -83,6 +91,7 @@ const boxHeight = "600px";
 const originalFile = ref("");
 const modifiedFile = ref("");
 const language = "c";
+const generating = ref(false);
 const cveId = defineModel("cveId", { required: true });
 const versionNumber = defineModel("versionNumber", { required: true });
 
@@ -119,6 +128,7 @@ const steps = ref([
 ])<Step[]>;
 
 function resetSteps() {
+  generating.value = false;
   steps.value = steps.value.map((step) => {
     step.status = "not-started";
     step.result = "";
@@ -133,6 +143,7 @@ function handleUpdate(val: any) {
 }
 
 async function generate() {
+  generating.value = true;
   let codeSnippets = "";
   let functionName = "";
   let terminate = false;
@@ -163,11 +174,12 @@ async function generate() {
     step.result = await step.function(payload).then((result) => {
       step.status = "finished";
       if (step.name === "Extract the diff hunks") {
-        codeSnippets = encodeURIComponent(JSON.stringify(result));
+        codeSnippets = encodeURIComponent(JSON.stringify(result)).trim();
       } else if (step.name == "Extract the target function name") {
         if (result && result.includes("I cannot answer")) {
           terminate = true;
           step.status = "error";
+          generating.value = false;
         }
         functionName = result;
       } else if (step.name == "Apply patch") {
@@ -177,6 +189,7 @@ async function generate() {
       console.log("step", step.name, "finished...");
       return result;
     });
+    generating.value = false;
   }
   // extractingCodeSnippets.value = true;
   // const codeSnippets = await extractCodeSnippets({
