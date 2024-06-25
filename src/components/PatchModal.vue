@@ -142,6 +142,15 @@ function handleUpdate(val: any) {
   emit("update:modelValue", val);
 }
 
+function extractWord(inputString) {
+  try {
+    const regex = /`([^`]+)`/;
+    const match = inputString.match(regex);
+    return match ? match[1] : inputString;
+  } catch (e) {
+    return inputString;
+  }
+}
 async function generate() {
   generating.value = true;
   let codeSnippets = "";
@@ -166,7 +175,7 @@ async function generate() {
       payload = {
         cveId: cveId.value,
         codeSnippets,
-        functionName,
+        functionName: extractWord(functionName),
         versionNumber: versionNumber.value,
       };
     }
