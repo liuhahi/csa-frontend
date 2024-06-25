@@ -245,9 +245,9 @@
                       v-if="row.ai_fix"
                       size="small"
                       type="success"
-                      @click="openPatchModal"
+                      @click="openPatchModal(row.public_id, props.row.version_number)"
                     >
-                      Try Fix
+                      Generate
                     </el-button>
                     <el-txt v-else type="body2"> - </el-txt>
                   </template>
@@ -259,7 +259,7 @@
       </div>
     </div>
   </div>
-  <PatchModal v-model="showPatchModal" />
+  <PatchModal v-model="showPatchModal" :cve-id="selectedCVE" :version-number="selectedVersionNumber"/>
 </template>
 <script setup lang="ts">
 import { ref, reactive, watch } from "vue";
@@ -305,6 +305,8 @@ const general_issue = ref<{
 const allData = ref([]);
 const tableData = ref([]);
 const loading = ref(false);
+const selectedCVE = ref("");
+const selectedVersionNumber = ref("");
 const statusList = [
   {
     label: "Fixed",
@@ -443,7 +445,7 @@ const securityColumns = [
     minWidth: "99px",
   },
   {
-    label: "AI Fix",
+    label: "AI Remediation",
     type: "Any",
     prop: "ai_fix",
     align: "center",
@@ -511,7 +513,9 @@ function formatNumber<T extends Record<string, any>>(obj: T): T {
   return newObj as T;
 }
 
-function openPatchModal() {
+function openPatchModal(cveId: string, versionNumber: string) {
+  selectedCVE.value = cveId;
+  selectedVersionNumber.value = versionNumber;
   showPatchModal.value = true;
 }
 
