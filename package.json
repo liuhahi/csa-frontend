@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "axios": "^1.7.2",
-    "element-plus": "file:element-plus-v0.3.9-sct.tgz",
+    "element-plus": "file:element-plus-v0.4.1-sct.tgz",
     "monaco-editor": "^0.50.0",
     "sass": "^1.77.6",
     "unocss": "^0.58.6",

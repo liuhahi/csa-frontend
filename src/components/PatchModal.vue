@@ -217,24 +217,6 @@ const handleOpen = () => {
   resetSteps();
 };
 </script>
-<style lang="scss" scoped>
-.m-code_trace_popup {
-  max-height: calc(100vh - var(--el-custom-popup-margin-top, 15vh) * 2);
-  display: flex;
-  flex-direction: column;
-  .el-scrollbar {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    .el-scrollbar__wrap {
-      flex: 1;
-    }
-  }
-  .el-expandable-card__body {
-    padding: 0;
-  }
-}
-</style>
 <style lang="scss">
 .el-custom-popup__header {
   width: auto;

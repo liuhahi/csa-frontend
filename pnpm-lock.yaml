@@ -12,8 +12,8 @@ importers:
         specifier: ^1.7.2
         version: 1.7.2
       element-plus:
-        specifier: file:element-plus-v0.3.9-sct.tgz
-        version: file:element-plus-v0.3.9-sct.tgz(vue@3.4.21)
+        specifier: file:element-plus-v0.4.1-sct.tgz
+        version: file:element-plus-v0.4.1-sct.tgz(vue@3.4.21)
       monaco-editor:
         specifier: ^0.50.0
         version: 0.50.0
@@ -737,8 +737,8 @@ packages:
   electron-to-chromium@1.4.717:
     resolution: {integrity: sha512-6Fmg8QkkumNOwuZ/5mIbMU9WI3H2fmn5ajcVya64I5Yr5CcNmO7vcLt0Y7c96DCiMO5/9G+4sI2r6eEvdg1F7A==}
 
-  element-plus@file:element-plus-v0.3.9-sct.tgz:
-    resolution: {integrity: sha512-BoWkUj8C8wm+e6n/C/WD+xEnV6n1QFJthLXCwH5Jq/FDJH2R8tQxF+7x3ow+qjihK+r1xFsYaHweowswmbsFgg==, tarball: file:element-plus-v0.3.9-sct.tgz}
+  element-plus@file:element-plus-v0.4.1-sct.tgz:
+    resolution: {integrity: sha512-+2YIIuPhcyVlulv96d5bcHEtwzz5R/PVjEbwWzLVRGYmwKrUspRqtjPhG7czsfSdp2n0GKIkSk1fe+0ke7lDkQ==, tarball: file:element-plus-v0.4.1-sct.tgz}
     version: 0.0.0-dev.1
     peerDependencies:
       vue: ^3.2.0
@@ -1920,7 +1920,7 @@ snapshots:
 
   electron-to-chromium@1.4.717: {}
 
-  element-plus@file:element-plus-v0.3.9-sct.tgz(vue@3.4.21):
+  element-plus@file:element-plus-v0.4.1-sct.tgz(vue@3.4.21):
     dependencies:
       '@ctrl/tinycolor': 3.6.1
       '@element-plus/icons-vue': 2.3.1(vue@3.4.21)

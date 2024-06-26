@@ -148,54 +148,59 @@
             @expand-change="handleExpandChange"
           >
             <template #top-left>
-              <el-input
-                style="width: 300px"
-                v-model="q.search"
-                clearable
-                :prefix-icon="Search"
-                placeholder="Search library"
-                @keyup.stop="handleSearch"
-                @clear="fireSearch"
-              />
-              <el-select
-                v-model="q.status"
-                clearable
-                placeholder="Status"
-                @change="(val) => handleChange(val, 'status')"
-              >
-                <el-option
-                  v-for="item in statusList"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
-              <el-select
-                v-model="q.exploitable"
-                clearable
-                placeholder="Exploitability"
-                @change="(val) => handleChange(val, 'exploitable')"
-              >
-                <el-option
-                  v-for="item in exploitableList"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
-              <el-select
-                v-model="q.fixible"
-                clearable
-                placeholder="Fixibility"
-                @change="(val) => handleChange(val, 'fixible')"
-              >
-                <el-option
-                  v-for="item in fixibility"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
+              <div class="flex flex-row space-x-4">
+                <el-input
+                  class="w-60"
+                  v-model="q.search"
+                  clearable
+                  :prefix-icon="Search"
+                  placeholder="Search library"
+                  @keyup.stop="handleSearch"
+                  @clear="fireSearch"
+                />
+                <el-select
+                  class="w-30"
+                  v-model="q.status"
+                  clearable
+                  placeholder="Status"
+                  @change="(val) => handleChange(val, 'status')"
+                >
+                  <el-option
+                    v-for="item in statusList"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  ></el-option>
+                </el-select>
+                <el-select
+                  class="w-30"
+                  v-model="q.exploitable"
+                  clearable
+                  placeholder="Exploitability"
+                  @change="(val) => handleChange(val, 'exploitable')"
+                >
+                  <el-option
+                    v-for="item in exploitableList"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  ></el-option>
+                </el-select>
+                <el-select
+                  class="w-40"
+                  v-model="q.fixible"
+                  clearable
+                  placeholder="Fixibility"
+                  @change="(val) => handleChange(val, 'fixible')"
+                >
+                  <el-option
+                    v-for="item in fixibility"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  ></el-option>
+                </el-select>
+              </div>
             </template>
             <template #library="{ row }">
               <div class="flex gap-x-4 items-center">
@@ -240,12 +245,29 @@
                     </el-txt>
                   </template>
 
+                  <template #upload="{ row }">
+                    <el-button
+                      size="small"
+                      type="plain"
+                      @click="
+                        openFileUploadModal(
+                          row.public_id,
+                          props.row.version_number
+                        )
+                      "
+                    >
+                      Upload
+                    </el-button>
+                  </template>
+
                   <template #ai_fix="{ row }">
                     <el-button
                       v-if="row.ai_fix"
                       size="small"
                       type="success"
-                      @click="openPatchModal(row.public_id, props.row.version_number)"
+                      @click="
+                        openPatchModal(row.public_id, props.row.version_number)
+                      "
                     >
                       Generate
                     </el-button>
@@ -259,7 +281,16 @@
       </div>
     </div>
   </div>
-  <PatchModal v-model="showPatchModal" :cve-id="selectedCVE" :version-number="selectedVersionNumber"/>
+  <PatchModal
+    v-model="showPatchModal"
+    :cve-id="selectedCVE"
+    :version-number="selectedVersionNumber"
+  />
+  <FileUpload
+    v-model="showFileUploadModal"
+    :cve-id="selectedCVE"
+    :version-number="selectedVersionNumber"
+  />
 </template>
 <script setup lang="ts">
 import { ref, reactive, watch } from "vue";
@@ -271,6 +302,7 @@ import {
 } from "../utils/helperFunctions";
 import { getCVEObjects } from "@/api/cve";
 import PatchModal from "./PatchModal.vue";
+import FileUpload from "./FileUpload.vue";
 
 const route = useRoute();
 
@@ -445,6 +477,14 @@ const securityColumns = [
     minWidth: "99px",
   },
   {
+    label: "Upload Files",
+    type: "Any",
+    prop: "upload",
+    align: "center",
+    headerAlign: "center",
+    minWidth: "99px",
+  },
+  {
     label: "AI Remediation",
     type: "Any",
     prop: "ai_fix",
@@ -456,6 +496,7 @@ const securityColumns = [
 
 const cveList = ref([]);
 const showPatchModal = ref(false);
+const showFileUploadModal = ref(false);
 
 function handleChange(val, key) {
   q[key] = val;
@@ -517,6 +558,12 @@ function openPatchModal(cveId: string, versionNumber: string) {
   selectedCVE.value = cveId;
   selectedVersionNumber.value = versionNumber;
   showPatchModal.value = true;
+}
+
+function openFileUploadModal(cveId: string, versionNumber: string) {
+  selectedCVE.value = cveId;
+  selectedVersionNumber.value = versionNumber;
+  showFileUploadModal.value = true;
 }
 
 function init() {
