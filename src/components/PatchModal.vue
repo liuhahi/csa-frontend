@@ -37,13 +37,15 @@
             <div v-if="step.status == 'finished'">
               <diff-editor
                 v-if="step.template == 'code-diff'"
-                id="code-trace-diff-editor"
+                :id="`code-trace-diff-editor-${step.id}`"
                 :boxHeight="boxHeight"
-                :original="originalFile"
-                :modified="modifiedFile"
+                :original="step.original"
+                :modified="step.modified"
                 :language="language"
               />
-              <pre v-else><code>{{ step.result }}</code></pre>
+              <pre
+                v-else
+              ><code style="white-space: pre-wrap">{{ step.result }}</code></pre>
             </div>
           </li>
         </ul>
@@ -101,17 +103,23 @@ interface Step {
   template: string;
   result: string;
   function: Promise<any>;
+  original?: string;
+  modified?: string;
 }
 
 const steps = ref([
   {
+    id: 1,
     name: "Extract the diff hunks",
     status: "not-started",
     template: "default",
     result: "",
     function: (payload) => extractCodeSnippets(payload),
+    original: "",
+    modified: "",
   },
   {
+    id: 2,
     name: "Extract the target function name",
     status: "not-started",
     template: "default",
@@ -119,6 +127,7 @@ const steps = ref([
     function: (payload) => extractFunctionName(payload),
   },
   {
+    id: 3,
     name: "Apply patch",
     status: "not-started",
     template: "code-diff",
@@ -192,8 +201,8 @@ async function generate() {
         }
         functionName = result;
       } else if (step.name == "Apply patch") {
-        originalFile.value = result.original;
-        modifiedFile.value = result.modified;
+        step.original = result.original;
+        step.modified = result.modified;
       }
       console.log("step", step.name, "finished...");
       return result;
