@@ -37,7 +37,7 @@ export const extractFunctionName = (payload) => {
 
 export const applyPatch = (payload) => {
   return axios
-    .get(`${API_BASE}/apply-patch/?cve=${payload.cveId}&version-number=${payload.versionNumber}&code-snippets=${payload.codeSnippets}&function-name=${payload.functionName}`, CONFIG())
+    .get(`${API_BASE}/apply-patch/?cve=${payload.cveId}&version-number=${payload.versionNumber}&code-snippets=${payload.codeSnippets}`, CONFIG())
     .then((res) => res.data)
     .catch((e) => errorHandler(e));
 }

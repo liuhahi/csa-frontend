@@ -43,6 +43,8 @@
                 :modified="step.modified"
                 :language="language"
               />
+
+
               <pre
                 v-else
               ><code style="white-space: pre-wrap">{{ step.result }}</code></pre>
@@ -78,7 +80,6 @@ import {
 } from "@element-plus/icons-vue";
 import {
   extractCodeSnippets,
-  extractFunctionName,
   applyPatch,
 } from "@/api/cve";
 
@@ -120,14 +121,6 @@ const steps = ref([
   },
   {
     id: 2,
-    name: "Extract the target function name",
-    status: "not-started",
-    template: "default",
-    result: "",
-    function: (payload) => extractFunctionName(payload),
-  },
-  {
-    id: 3,
     name: "Apply patch",
     status: "not-started",
     template: "code-diff",
@@ -151,15 +144,6 @@ function handleUpdate(val: any) {
   emit("update:modelValue", val);
 }
 
-function extractWord(inputString) {
-  try {
-    const regex = /`([^`]+)`/;
-    const match = inputString.match(regex);
-    return match ? match[1] : inputString;
-  } catch (e) {
-    return inputString;
-  }
-}
 async function generate() {
   generating.value = true;
   let codeSnippets = "";
@@ -176,15 +160,10 @@ async function generate() {
       payload = {
         cveId: cveId.value,
       };
-    } else if (step.name === "Extract the target function name") {
-      payload = {
-        codeSnippets,
-      };
-    } else if (step.name === "Apply patch") {
+    } if (step.name === "Apply patch") {
       payload = {
         cveId: cveId.value,
         codeSnippets,
-        functionName: extractWord(functionName),
         versionNumber: versionNumber.value,
       };
     }
@@ -209,17 +188,6 @@ async function generate() {
     });
     generating.value = false;
   }
-  // extractingCodeSnippets.value = true;
-  // const codeSnippets = await extractCodeSnippets({
-  //   cveId: cveId.value,
-  // })
-  //   .then((result) => {
-  //     extractCodeSnippetsFinished.value = true;
-  //     extractCodeSnippetsResult.value = result;
-  //   })
-  //   .finally(() => {
-  //     extractingCodeSnippets.value = false;
-  //   });
 }
 
 const handleOpen = () => {
