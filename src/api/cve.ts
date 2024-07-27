@@ -41,3 +41,10 @@ export const applyPatch = (payload) => {
     .then((res) => res.data)
     .catch((e) => errorHandler(e));
 }
+
+export const submitPatchLinks = (payload) => {
+  return axios
+    .post(`${API_BASE}/submit-patch-links/`, payload, CONFIG())
+    .then((res) => res.data)
+    .catch((e) => errorHandler(e));
+}

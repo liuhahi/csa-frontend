@@ -252,7 +252,8 @@
                       @click="
                         openFileUploadModal(
                           row.public_id,
-                          props.row.version_number
+                          props.row.version_number,
+                          props.row.repo_url.to
                         )
                       "
                     >
@@ -289,6 +290,7 @@
   <FileUpload
     v-model="showFileUploadModal"
     :cve-id="selectedCVE"
+    :repo-url="selectedRepoUrl"
     :version-number="selectedVersionNumber"
   />
 </template>
@@ -338,6 +340,7 @@ const allData = ref([]);
 const tableData = ref([]);
 const loading = ref(false);
 const selectedCVE = ref("");
+const selectedRepoUrl = ref("");
 const selectedVersionNumber = ref("");
 const statusList = [
   {
@@ -560,8 +563,13 @@ function openPatchModal(cveId: string, versionNumber: string) {
   showPatchModal.value = true;
 }
 
-function openFileUploadModal(cveId: string, versionNumber: string) {
+function openFileUploadModal(
+  cveId: string,
+  versionNumber: string,
+  repoUrl: string
+) {
   selectedCVE.value = cveId;
+  selectedRepoUrl.value = repoUrl;
   selectedVersionNumber.value = versionNumber;
   showFileUploadModal.value = true;
 }
