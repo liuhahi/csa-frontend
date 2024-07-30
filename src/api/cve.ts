@@ -30,21 +30,41 @@ export const extractCodeSnippets = (payload) => {
 
 export const extractFunctionName = (payload) => {
   return axios
-    .get(`${API_BASE}/extract-function-name/?code-snippets=${payload.codeSnippets}`, CONFIG())
+    .get(
+      `${API_BASE}/extract-function-name/?code-snippets=${payload.codeSnippets}`,
+      CONFIG()
+    )
     .then((res) => res.data)
     .catch((e) => errorHandler(e));
-}
+};
 
 export const applyPatch = (payload) => {
   return axios
-    .get(`${API_BASE}/apply-patch/?cve=${payload.cveId}&version-number=${payload.versionNumber}&code-snippets=${payload.codeSnippets}`, CONFIG())
+    .get(
+      `${API_BASE}/apply-patch/?cve=${payload.cveId}&version-number=${payload.versionNumber}&code-snippets=${payload.codeSnippets}`,
+      CONFIG()
+    )
     .then((res) => res.data)
     .catch((e) => errorHandler(e));
-}
+};
+
+export const getPatchLinks = (payload) => {
+  return axios
+    .get(`${API_BASE}/get-patch-links/?cve=${payload.cveId}`, CONFIG())
+    .then((res) => res.data)
+    .catch((e) => errorHandler(e));
+};
 
 export const submitPatchLinks = (payload) => {
   return axios
     .post(`${API_BASE}/submit-patch-links/`, payload, CONFIG())
     .then((res) => res.data)
     .catch((e) => errorHandler(e));
-}
+};
+
+export const deletePatchLink = (payload) => {
+  return axios
+    .delete(`${API_BASE}/delete-patch-link/${payload.id}/`, CONFIG())
+    .then((res) => res.data)
+    .catch((e) => errorHandler(e));
+};

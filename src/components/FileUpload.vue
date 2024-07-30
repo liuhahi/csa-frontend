@@ -8,28 +8,22 @@
     @update:model-value="handleUpdate"
     @open="handleOpen"
   >
+    <el-card shadow="never">
+      <template #header>Current folder</template>
+      <div v-for="link in currentPatches" :key="link" class="mb-2">
+        <div class="flex flex-row gap-x-2 items-center">
+          <el-icon><Document /></el-icon>
+          <el-link :href="`${repoUrl}/commit/${link}`" target="_blank">{{
+            `${repoUrl}/commit/${link}`
+          }}</el-link>
+        </div>
+      </div>
+    </el-card>
     <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
       <div class="flex flex-col gap-y-4">
         <el-tab-pane label="URL" name="url">
           <el-form ref="formRef" :model="dynamicValidateForm">
-            <div>
-              https://github.com/torvalds/linux/commit/95a762e2c8c942780948091f8f2a4f32fce1ac6f
-            </div>
-            <div>
-              https://github.com/torvalds/linux/commit/373c4557d2aa362702c4c2d41288fb1e54990b7c
-            </div>
-            <el-card shadow="never">
-              <template #header>Current folder</template>
-              <div v-for="link in currentPatches" :key="link" class="mb-2">
-                <div class="flex flex-row gap-x-2 items-center">
-                  <el-icon><Document /></el-icon>
-                  <el-link :href="`${repoUrl}/commit/${link}`" target="_blank">{{
-                    `${repoUrl}/commit/${link}`
-                  }}</el-link>
-                </div>
-              </div>
-            </el-card>
-            <div class="mb-4">
+            <div class="my-4">
               <el-txt type="body"
                 >Please copy and past the github commit url here</el-txt
               >
@@ -116,7 +110,7 @@
 <script lang="ts" setup>
 import { reactive, ref } from "vue";
 import { API_BASE } from "@/api/config";
-import { submitPatchLinks } from "@/api/cve";
+import { submitPatchLinks, getPatchLinks, deletePatchLink } from "@/api/cve";
 import { Delete, Document } from "@element-plus/icons-vue";
 import type { FormInstance } from "element-plus";
 
@@ -146,7 +140,7 @@ const props = defineProps({
     default: "",
   },
 });
-const subFolder = ref("patch-files");
+const subFolder = ref(versionNumber.value);
 const currentPatches = ref<string[]>([]);
 
 const activeName = ref("url");
@@ -184,7 +178,10 @@ const submitForm = (formEl: FormInstance | undefined) => {
       submitPatchLinks({
         patches: dynamicValidateForm.patches.map((patch) => patch.value),
         "cve-id": cveId.value,
-        subfolder: subFolder.value,
+        subfolder: "patch-files",
+      }).then(() => {
+        submitting.value = false;
+        init();
       });
     } else {
       console.log("error submit!");
@@ -200,7 +197,10 @@ function init() {
       value: "",
     },
   ];
-  currentPatches.value = ["patch1", "patch2"];
+  getPatchLinks({ cveId: cveId.value }).then((res) => {
+    console.log("what is res", res);
+    currentPatches.value = res.map((item) => item.split("/").pop());
+  });
 }
 
 function handleUpdate() {}
