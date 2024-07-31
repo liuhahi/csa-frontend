@@ -248,7 +248,6 @@
                   <template #upload="{ row }">
                     <el-button
                       size="small"
-                      type="plain"
                       @click="
                         openFileUploadModal(
                           row.public_id,

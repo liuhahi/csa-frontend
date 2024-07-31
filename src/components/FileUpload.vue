@@ -2,20 +2,43 @@
   <el-custom-popup
     v-model="props.modelValue"
     :title="`Upload file to ${cveId}/${versionNumber}`"
-    width="640px"
+    width="740px"
     :destroy-on-close="true"
     @close="handleClose"
     @update:model-value="handleUpdate"
     @open="handleOpen"
   >
     <el-card shadow="never">
-      <template #header>Current folder</template>
+      <template #header>Vulnerable Files</template>
+      <div v-for="link in currentVulnerableFiles" :key="link" class="mb-2">
+        <div class="flex flex-row gap-x-2 items-center">
+          <el-icon><Document /></el-icon>
+          <el-link target="_blank">{{ `${link}` }}</el-link>
+          <el-button
+            type="danger"
+            size="small"
+            :icon="Delete"
+            @click.prevent="deleteVulnerableFileHandler(link)"
+          >
+          </el-button>
+        </div>
+      </div>
+    </el-card>
+    <el-card class="mt-4" shadow="never">
+      <template #header>Patch files</template>
       <div v-for="link in currentPatches" :key="link" class="mb-2">
         <div class="flex flex-row gap-x-2 items-center">
           <el-icon><Document /></el-icon>
           <el-link :href="`${repoUrl}/commit/${link}`" target="_blank">{{
             `${repoUrl}/commit/${link}`
           }}</el-link>
+          <el-button
+            type="danger"
+            size="small"
+            :icon="Delete"
+            @click.prevent="deletePatch(link)"
+          >
+          </el-button>
         </div>
       </div>
     </el-card>
@@ -62,7 +85,12 @@
               <div class="w-full">
                 <div class="flex justify-end space-x-4">
                   <el-button @click="addPatch" type="success">New</el-button>
-                  <el-button v-if="submitting == true" :loading="true" disabled>
+                  <el-button
+                    v-if="submitting == true"
+                    type="info"
+                    :loading="true"
+                    disabled
+                  >
                     Submitting
                   </el-button>
                   <el-button v-else type="primary" @click="submitForm(formRef)"
@@ -78,7 +106,9 @@
             <el-txt type="body1">Select a destination</el-txt>
             <el-radio-group v-model="subFolder">
               <el-radio :value="versionNumber" size="small">
-                <el-txt type="body2">{{ versionNumber }}</el-txt></el-radio
+                <el-txt type="body2"
+                  >Vulnerable Files in {{ versionNumber }}</el-txt
+                ></el-radio
               >
               <el-radio value="patch-files" size="small"
                 ><el-txt type="body2">Patch File</el-txt></el-radio
@@ -89,6 +119,7 @@
               drag
               :data="{ 'cve-id': cveId, subfolder: subFolder }"
               :action="`${API_BASE}/upload-target-file/`"
+              :on-success="uploadCallback"
               multiple
             >
               <el-icon class="el-icon--upload"><upload-filled /></el-icon>
@@ -110,9 +141,15 @@
 <script lang="ts" setup>
 import { reactive, ref } from "vue";
 import { API_BASE } from "@/api/config";
-import { submitPatchLinks, getPatchLinks, deletePatchLink } from "@/api/cve";
+import {
+  submitPatchLinks,
+  getPatchLinks,
+  deletePatchLink,
+  getVulnerableFiles,
+  deleteVulnerableFile,
+} from "@/api/cve";
 import { Delete, Document } from "@element-plus/icons-vue";
-import type { FormInstance } from "element-plus";
+import { ElMessage, ElMessageBox, type FormInstance } from "element-plus";
 
 const formRef = ref<FormInstance>();
 const dynamicValidateForm = reactive<{
@@ -142,6 +179,7 @@ const props = defineProps({
 });
 const subFolder = ref(versionNumber.value);
 const currentPatches = ref<string[]>([]);
+const currentVulnerableFiles = ref<string[]>([]);
 
 const activeName = ref("url");
 function handleClick(tab, event) {
@@ -197,9 +235,58 @@ function init() {
       value: "",
     },
   ];
+  getVulnerableFiles({ cveId: cveId.value, version: versionNumber.value }).then(
+    (res) => {
+      currentVulnerableFiles.value = res.map((item) => item.split("/").pop());
+    }
+  );
   getPatchLinks({ cveId: cveId.value }).then((res) => {
-    console.log("what is res", res);
     currentPatches.value = res.map((item) => item.split("/").pop());
+  });
+}
+
+function uploadCallback() {
+  init();
+}
+
+function deleteVulnerableFileHandler(filename) {
+  ElMessageBox.confirm("Do you want to delete this file?", "Warning", {
+    confirmButtonText: "OK",
+    cancelButtonText: "Cancel",
+    type: "warning",
+  }).then(() => {
+    const payload = {
+      "cve-id": cveId.value,
+      version: versionNumber.value,
+      filename: filename,
+    };
+    deleteVulnerableFile(payload).then(() => {
+      init();
+      ElMessage({
+        type: "success",
+        message: "Delete completed",
+      });
+    });
+  });
+}
+
+function deletePatch(filename) {
+  ElMessageBox.confirm("Do you want to delete this patch?", "Warning", {
+    confirmButtonText: "OK",
+    cancelButtonText: "Cancel",
+    type: "warning",
+  }).then(() => {
+    const payload = {
+      "cve-id": cveId.value,
+      filename: filename,
+    };
+    deletePatchLink(payload).then(() => {
+      init();
+      ElMessage({
+        type: "success",
+        message: "Delete completed",
+      });
+    });
   });
 }
 

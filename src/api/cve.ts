@@ -48,6 +48,20 @@ export const applyPatch = (payload) => {
     .catch((e) => errorHandler(e));
 };
 
+export const getVulnerableFiles = (payload) => {
+  return axios
+    .get(`${API_BASE}/get-vulnerable-files/?cve=${payload.cveId}&version=${payload.version}`, CONFIG())
+    .then((res) => res.data)
+    .catch((e) => errorHandler(e));
+};
+
+export const deleteVulnerableFile = (payload) => {
+  return axios
+    .post(`${API_BASE}/delete-vulnerable-files/`, payload, CONFIG())
+    .then((res) => res.data)
+    .catch((e) => errorHandler(e));
+};
+
 export const getPatchLinks = (payload) => {
   return axios
     .get(`${API_BASE}/get-patch-links/?cve=${payload.cveId}`, CONFIG())
@@ -64,7 +78,7 @@ export const submitPatchLinks = (payload) => {
 
 export const deletePatchLink = (payload) => {
   return axios
-    .delete(`${API_BASE}/delete-patch-link/${payload.id}/`, CONFIG())
+    .post(`${API_BASE}/delete-patch-links/`, payload, CONFIG())
     .then((res) => res.data)
     .catch((e) => errorHandler(e));
 };
